@@ -1,23 +1,59 @@
 # Identity Attack Paths
 
-Mini research briefs for common Microsoft identity attack paths in Microsoft Entra ID and Microsoft 365. The focus is hunting, triage, and containment rather than full incident response playbooks.
+Markdown-heavy research briefs for high-value Microsoft identity attack paths across Microsoft Entra ID and Microsoft 365.
 
-## Scope
+This repository is built as a practical defender KB: short writeups, hunt-oriented telemetry, sample KQL, containment guidance, and ATT&CK mapping for common identity-centric intrusion paths.
 
-- Microsoft Entra ID identities, applications, service principals, and Conditional Access
-- Exchange Online mailbox persistence and forwarding abuse
-- Detection-first writeups for analysts, threat hunters, and defenders building a KB
+## What This Repo Covers
 
-## How To Use This Repo
+- OAuth and application-consent abuse
+- Token replay and session theft
+- MFA method and device registration abuse
+- Privileged role escalation in Entra ID and Azure
+- Service principal and non-human identity abuse
+- Exchange Online mailbox rule persistence
+- Conditional Access bypass opportunities and policy gaps
 
-1. Start with the brief that matches the hypothesis or alert.
-2. Confirm the required telemetry is enabled in your tenant.
-3. Adapt the sample KQL to your own table names, allowlists, and high-value identities.
-4. Promote the logic into analytics, workbooks, or investigation checklists.
+## Who This Is For
 
-## Assumed Log Sources
+- Threat hunters building Microsoft identity hypotheses
+- Detection engineers converting research into analytics
+- Incident responders triaging cloud identity persistence
+- Security teams building a lightweight internal identity-defense KB
 
-The examples assume Microsoft Sentinel or Log Analytics connectors that expose data in tables such as:
+## Brief Format
+
+Each brief follows the same structure:
+
+- What the technique is
+- Why it works
+- Telemetry to hunt
+- Sample detection logic
+- Containment steps
+- MITRE mapping
+
+## Quick Start
+
+1. Pick the brief that matches the alert, hypothesis, or control gap.
+2. Validate that the required Entra, Microsoft 365, and endpoint telemetry is enabled.
+3. Adapt the sample KQL to your table names, watchlists, and allowlists.
+4. Use the containment guidance to shape triage and response steps.
+
+## Briefs
+
+| Brief | Focus | Core telemetry | ATT&CK |
+| --- | --- | --- | --- |
+| [OAuth Consent Phishing](briefs/oauth-consent-phishing.md) | Malicious app consent and delegated access | `AuditLogs`, `SigninLogs` | `T1528` |
+| [Token Theft](briefs/token-theft.md) | Replay of stolen access, refresh, or session artifacts | `SigninLogs`, `AADNonInteractiveUserSignInLogs`, endpoint telemetry | `T1528`, `T1539` |
+| [MFA Device Registration Abuse](briefs/mfa-device-registration-abuse.md) | Attacker-controlled MFA method or device enrollment | `AuditLogs`, `SigninLogs` | `T1098.005`, `T1556.006` |
+| [Privileged Role Escalation](briefs/privileged-role-escalation.md) | Illicit assignment or activation of high-value roles | `AuditLogs`, `AzureActivity` | `T1098.003` |
+| [Service Principal Abuse](briefs/service-principal-abuse.md) | Backdooring or abusing non-human identities | `AuditLogs`, `AADServicePrincipalSignInLogs` | `T1098.001`, `T1098.003` |
+| [Mailbox Rule Persistence](briefs/mailbox-rule-persistence.md) | Forwarding, hiding, and collection through mail rules | `OfficeActivity`, mailbox audit logs | `T1114.003` |
+| [Conditional Access Bypass Opportunities](briefs/conditional-access-bypass-opportunities.md) | Exclusions, weak scoping, and policy-driven bypass paths | `SigninLogs`, `AuditLogs` | `T1556.009` |
+
+## Assumed Data Sources
+
+The examples assume Microsoft Sentinel or Log Analytics ingestion for sources such as:
 
 - `AuditLogs`
 - `SigninLogs`
@@ -27,30 +63,35 @@ The examples assume Microsoft Sentinel or Log Analytics connectors that expose d
 - `CloudAppEvents`
 - `DeviceProcessEvents`
 - `DeviceFileEvents`
+- `AzureActivity`
 
-Some fields and table names vary by connector and export method. Treat the queries as starter logic, not copy-paste detections.
+Field names and table availability vary by connector and export path. Treat the KQL in this repo as starter logic that should be tuned for your tenant.
 
-## Briefs
+## Hunting Principles
 
-| Brief | Primary focus | Core telemetry | Primary ATT&CK |
-| --- | --- | --- | --- |
-| [OAuth Consent Phishing](briefs/oauth-consent-phishing.md) | Malicious app consent and delegated access | `AuditLogs`, `SigninLogs` | `T1528` |
-| [Token Theft](briefs/token-theft.md) | Replay of stolen access, refresh, or session tokens | `SigninLogs`, `AADNonInteractiveUserSignInLogs`, endpoint telemetry | `T1528`, `T1539` |
-| [MFA Device Registration Abuse](briefs/mfa-device-registration-abuse.md) | Registering attacker-controlled methods or devices | `AuditLogs`, `SigninLogs` | `T1098.005` |
-| [Privileged Role Escalation](briefs/privileged-role-escalation.md) | Adding high-value Entra or Azure roles | `AuditLogs`, `AzureActivity` | `T1098.003` |
-| [Service Principal Abuse](briefs/service-principal-abuse.md) | Backdooring or abusing non-human identities | `AuditLogs`, `AADServicePrincipalSignInLogs` | `T1098.001` |
-| [Mailbox Rule Persistence](briefs/mailbox-rule-persistence.md) | Hidden forwarding, redirect, or delete rules | `OfficeActivity`, mailbox audit logs | `T1114.003` |
-| [Conditional Access Bypass Opportunities](briefs/conditional-access-bypass-opportunities.md) | Policy gaps, exclusions, and change-driven bypass paths | `SigninLogs`, `AuditLogs` | `T1556.009` |
+- Control-plane changes are often the earliest high-signal indicators.
+- Password resets alone rarely remove identity persistence in cloud environments.
+- Non-human identities deserve the same monitoring rigor as privileged user accounts.
+- Conditional Access and MFA failures are often governance problems before they are detection problems.
 
-## Common Hunting Themes
+## Repository Layout
 
-- A benign-looking control-plane change is often the earliest signal. Audit events usually appear before follow-on abuse.
-- Persistence in Microsoft identity systems often survives password resets unless the app grant, token, device, or role assignment is also removed.
-- Service principals, delegated grants, and mailbox rules are attractive because they create durable access with low user friction.
-- Conditional Access and MFA abuse are usually change-management problems as much as authentication problems.
+```text
+.
+├── README.md
+├── LICENSE
+└── briefs/
+    ├── conditional-access-bypass-opportunities.md
+    ├── mailbox-rule-persistence.md
+    ├── mfa-device-registration-abuse.md
+    ├── oauth-consent-phishing.md
+    ├── privileged-role-escalation.md
+    ├── service-principal-abuse.md
+    └── token-theft.md
+```
 
-## Suggested Next Additions
+## Roadmap
 
-- A shared glossary for Entra, Exchange, and Graph terms
-- A detection index grouped by table and ATT&CK technique
-- An investigation checklist for cross-brief pivots such as `CorrelationId`, `AppId`, `ServicePrincipalId`, and `UserPrincipalName`
+- Add a detection index grouped by telemetry source and ATT&CK technique
+- Add a shared glossary for Entra, Exchange, Graph, and Sentinel terms
+- Add analyst pivot guidance for entities such as `CorrelationId`, `AppId`, `ServicePrincipalId`, and `UserPrincipalName`

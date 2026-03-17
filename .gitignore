@@ -1,0 +1,23 @@
+# Local environment files
+.env
+.env.*
+.envrc
+
+# Common secret material
+*.key
+*.pem
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.token
+*.secret
+secrets.*
+credentials.*
+service-account*.json
+
+# macOS artifacts
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
