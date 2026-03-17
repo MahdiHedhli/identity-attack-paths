@@ -95,3 +95,18 @@ Field names and table availability vary by connector and export path. Treat the 
 - Add a detection index grouped by telemetry source and ATT&CK technique
 - Add a shared glossary for Entra, Exchange, Graph, and Sentinel terms
 - Add analyst pivot guidance for entities such as `CorrelationId`, `AppId`, `ServicePrincipalId`, and `UserPrincipalName`
+
+## 🚧 Notes
+
+These queries are intended for research, hunting, and detection engineering workflows. They should be tuned and validated within your environment to reduce noise and improve signal.
+
+This repository reflects ongoing research into attacker behavior and defensive detection strategies in Microsoft cloud environments.
+
+## 🧩 Related Work
+
+- [ThreatPedia](https://threatpedia.wiki)
+  Threat intelligence platform mapping attacker TTPs to detection logic and defensive strategies.
+- [KQL Detection Lab](https://github.com/MahdiHedhli/kql-detection-lab)
+  Detection engineering lab with KQL-based threat hunting queries for Microsoft Sentinel, Entra ID, and Microsoft 365 telemetry.
+- [Cloud Threat Hunting Playbook](https://github.com/MahdiHedhli/cloud-threat-hunting-playbook)
+  End-to-end investigation workflows for cloud and identity-focused incidents, aligned to real-world attacker behavior.
